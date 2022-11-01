@@ -8,9 +8,9 @@ class ApplicationController < Sinatra::Base
     notes.to_json
   end
 
-  get "/projects" do
-    projects = project.all
-    projects.to_json
+  get '/notes/:id' do
+    notes = Note.find(params[:id])
+    notes.to_json
   end
 
   get "/users" do
@@ -23,20 +23,30 @@ class ApplicationController < Sinatra::Base
     user.to_json
   end
 
-  get '/project/:title' do
-    project = Project.find_by(:title => params[:title])
-    project.to_json(include: :notes)
+  get '/projects' do
+    projects = Project.all
+    projects.to_json
   end
-  
-  get '/users/projects/:id' do
-    project = User.find(params[:id]).projects.uniq
-    project.to_json(include: :notes)
+
+  get '/projects/:id' do
+    projects = Project.find(params[:id])
+    projects.to_json
   end
+
+  get '/test/:id' do
+    titles = Note.find(params[:id]).projs
+    titles.to_json
+  end
+
+
+
 
   # get '/login/:username' do
   #   user = User.find_by(:username => params[:username])
   #   user.to_json(include: { notes: {include: :project}})
   # end
+
+  
 
 
   #CREATE
@@ -50,7 +60,7 @@ class ApplicationController < Sinatra::Base
     user.to_json
   end
 
-  post '/new_note' do
+  post '/notes' do
     note = Note.create(
       title: params[:title],
       body: params[:body],
@@ -59,24 +69,10 @@ class ApplicationController < Sinatra::Base
     note.to_json
   end
 
-  post '/new_project' do
-    project = project.create(
-      title: params[:title])
-    project.to_json
-  end
 
 
   #UPDATE
 
-  patch '/users' do
-    user = User.find(params[:id])
-    user.update(
-      username: params[:username],
-      password: params[:password],
-      email: params[:email],
-      bio: params[:bio])
-    user.to_json
-  end
 
   patch '/notes/:id' do
     note = Note.find(params[:id])
@@ -95,9 +91,4 @@ class ApplicationController < Sinatra::Base
     note.to_json
   end
 
-  delete '/projects/:id' do
-    project = project.find(params[:id])
-    project.destroy
-    project.to_json
-  end
 end
